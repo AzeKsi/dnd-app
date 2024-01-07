@@ -1,18 +1,19 @@
-import { useMemo } from "react";
 import { BlockCard } from "../blockCard/BlockCard";
 import { BlockListContainerProps } from "./BlockListContainer.types";
 import { SortableContext } from "@dnd-kit/sortable";
 import { DragOverlay } from "@dnd-kit/core";
 import { createPortal } from "react-dom";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { useBlockListContainer } from "./BlockListContainer.effect";
 
 export const BlockListContainer = ({
   blocks,
   createBlock,
   activeBlock,
+  moveUp,
+  moveDown,
 }: BlockListContainerProps) => {
-  const blocksId = useMemo(() => {
-    return blocks.map((block) => block.id);
-  }, [blocks]);
+  const { blocksId, parent } = useBlockListContainer(blocks);
 
   return (
     <div className="bg-zinc-800 h-[900px] rounded-md flex flex-col">
@@ -24,16 +25,21 @@ export const BlockListContainer = ({
           Block List
         </div>
       </div>
-      <div className="flex flex-grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
+      <div className="flex flex-grow flex-col p-2 overflow-x-hidden overflow-y-auto">
         <SortableContext items={blocksId}>
-          {blocks.map((block) => (
-            <BlockCard key={block.id} block={block} />
-          ))}
+          <ul className="flex flex-col gap-4" ref={parent}>
+            {blocks.map((block, index) => (
+              <li key={block.id}>
+                <BlockCard block={block} index={index} moveUp={moveUp} moveDown={moveDown} />
+              </li>
+            ))}
+          </ul>
         </SortableContext>
       </div>
       <button
-        className="flex p-4 rounded-md border-4 gap-2 items-cente hover:text-rose-500 transition-none hover:bg-neutral-900 border-zinc-800 active:bg-black"
+        className="flex p-4 rounded-md border-4 gap-2 items-cente hover:text-rose-500 transition-all hover:bg-neutral-900 border-zinc-800 active:bg-black"
         onClick={createBlock}>
+        <PlusCircleIcon width={24} height={24} />
         Add block
       </button>
       {createPortal(

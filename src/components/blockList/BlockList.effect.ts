@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Block } from "./BlockList.types";
-import { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
+import {
+  DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 
 export const useBlockList = () => {
@@ -56,5 +63,39 @@ export const useBlockList = () => {
     });
   };
 
-  return { blocks, createBlock, onDragStart, activeBlock, onDragEnd, onDragOver };
+  const moveUp = (index: number) => {
+    if (index > 0) {
+      const newItems = [...blocks];
+      [newItems[index], newItems[index - 1]] = [newItems[index - 1], newItems[index]];
+      setBlocks(newItems);
+    }
+  };
+
+  const moveDown = (index: number) => {
+    if (index < blocks.length - 1) {
+      const newItems = [...blocks];
+      [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+      setBlocks(newItems);
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    })
+  );
+
+  return {
+    blocks,
+    createBlock,
+    onDragStart,
+    activeBlock,
+    onDragEnd,
+    onDragOver,
+    moveUp,
+    moveDown,
+    sensors,
+  };
 };

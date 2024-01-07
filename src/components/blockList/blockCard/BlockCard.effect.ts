@@ -6,7 +6,6 @@ export const useBlockCard = (block: Block) => {
   const { setNodeRef, attributes, listeners, transition, transform, isDragging } = useSortable({
     id: block.id,
     data: {
-      type: "Block",
       block,
     },
   });
